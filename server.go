@@ -51,6 +51,9 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+//func logRequest() {
+//
+//}
 
 func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[INFO] Receiving /devops-on-duty request")
@@ -82,6 +85,7 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			response = fmt.Sprintf("%s is on duty today",onDuty)
 		} else {
+			fmt.Printf("[ERROR] Error finding DevOps on duty today %v",err)
 			response = "Error finding DevOps on duty today"
 		}
 		w.Write([]byte(response))

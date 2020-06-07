@@ -85,15 +85,13 @@ func getConfigmapValue(key string) (error,string) {
 func checkForSpecialChange(date time.Time) (error,string) {
 	value := date.Format("02.01.2006")
 	fmt.Printf("checkForSpecialChange on %s\n", value)
-	err,onDuty := getConfigmapValue(value)
-	return err,onDuty
+	return getConfigmapValue(value)
 }
 
 func checkDefaultSchedule(date time.Time) (error,string) {
 	value := date.Weekday().String()
 	fmt.Printf("checkDefaultSchedule on %s\n", value)
-	err,onDuty := getConfigmapValue(value)
-	return err,onDuty
+	return getConfigmapValue(value)
 }
 
 func whoIsOnDutyNow() (error,string) {
