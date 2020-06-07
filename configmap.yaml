@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: devops-shifts-board
+  name: devops-shifts-board
+  namespace: default
+data:
+  Sunday: Efrat
+  Monday: Efrat
+  Tuesday: Danny
+  5.6.2020: Efrat
+  6.6.2020: Efrat
+

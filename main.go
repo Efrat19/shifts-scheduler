@@ -16,13 +16,18 @@ package main
 
 import (
 	"context"
+	//"flag"
 	"fmt"
+	//"k8s.io/client-go/tools/clientcmd"
+	"os"
+	//"path/filepath"
 	"time"
 
-	"k8s.io/apimachinery/pkg/api/errors"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"errors"
 	//
 	// Uncomment to load all auth plugins
 	// _ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -33,8 +38,15 @@ import (
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 )
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return defaultValue
+	}
+	return value
+}
 
-func main() {
+func getConfigmapValue(key string) (error,string) {
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -45,29 +57,49 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	for {
-		// get pods in all the namespaces by omitting namespace
-		// Or specify namespace to get pods in particular namespace
-		pods, err := clientset.CoreV1().Pods("").List(context.TODO(), metav1.ListOptions{})
-		if err != nil {
-			panic(err.Error())
+	namespace := getEnv("DEVOPS_ONDUTY_NAMESPACE","default")
+	configmap := getEnv("DEVOPS_ONDUTY_CONFIGMAP","devops-shifts-board")
+	cm, err := clientset.CoreV1().ConfigMaps(namespace).Get(context.TODO(), configmap, metav1.GetOptions{})
+	if kerrors.IsNotFound(err) {
+		errMsg := fmt.Sprintf("Configmap %s in namespace %s not found\n", configmap, namespace)
+		fmt.Printf(errMsg)
+		return errors.New(errMsg),""
+	} else if statusError, isStatus := err.(*kerrors.StatusError); isStatus {
+		errMsg := fmt.Sprintf("Error getting configmap %s in namespace %s: %v\n",
+			configmap, namespace, statusError.ErrStatus.Message)
+		fmt.Printf(errMsg)
+		return errors.New(errMsg),""
+	} else if err != nil {
+		panic(err.Error())
+	} else {
+		fmt.Printf("Found configmap %s in namespace %s\n", configmap, namespace)
+		value := cm.Data[key]
+		if value != "" {
+			return nil,value
 		}
-		fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
-
-		// Examples for error handling:
-		// - Use helper functions e.g. errors.IsNotFound()
-		// - And/or cast to StatusError and use its properties like e.g. ErrStatus.Message
-		_, err = clientset.CoreV1().Pods("default").Get(context.TODO(), "example-xxxxx", metav1.GetOptions{})
-		if errors.IsNotFound(err) {
-			fmt.Printf("Pod example-xxxxx not found in default namespace\n")
-		} else if statusError, isStatus := err.(*errors.StatusError); isStatus {
-			fmt.Printf("Error getting pod %v\n", statusError.ErrStatus.Message)
-		} else if err != nil {
-			panic(err.Error())
-		} else {
-			fmt.Printf("Found example-xxxxx pod in default namespace\n")
-		}
-
-		time.Sleep(10 * time.Second)
+		return errors.New(fmt.Sprintf("requested key %s not found in configmap %s",key,configmap)),""
 	}
+}
+
+func checkForSpecialChange(date time.Time) (error,string) {
+	err,onDuty := getConfigmapValue(date.Format("02.01.2006"))
+	return err,onDuty
+}
+
+func checkDefaultSchedule(date time.Time) (error,string) {
+	err,onDuty := getConfigmapValue(date.Weekday().String())
+	return err,onDuty
+}
+
+func whoIsOnDutyNow() (error,string) {
+	now := time.Now()
+	var onDuty string
+	err,onDuty := checkForSpecialChange(now)
+	if err != nil {
+		err,onDuty = checkDefaultSchedule(now)
+		if err != nil {
+			return err,""
+		}
+	}
+	return nil,onDuty
 }
