@@ -78,6 +78,7 @@ func getConfigmapValue(key string) (error,string) {
 			fmt.Printf("Found value %s for key %s\n", value, key)
 			return nil,value
 		}
+		fmt.Printf("requested key %s not found in configmap %s",key,configmap)
 		return errors.New(fmt.Sprintf("requested key %s not found in configmap %s",key,configmap)),""
 	}
 }
