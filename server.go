@@ -51,12 +51,15 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-//func logRequest() {
-//
-//}
+func logRequest(r *http.Request) {
+	fmt.Println("[INFO] Logging /devops-on-duty request")
+	fmt.Printf("%v just triggered a /devops-on-duty request",r.Body)
+
+}
 
 func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[INFO] Receiving /devops-on-duty request")
+	logRequest(r)
 	signingSecret := getEnv("SLACK_SIGNING_SECRET","")
 	verifier, err := slack.NewSecretsVerifier(r.Header, signingSecret)
 	if err != nil {
