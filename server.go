@@ -3,11 +3,12 @@ package main
 import (
 	//"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
+
 	//"log"
 	//"math"
 	"net/http"
-	"os"
-
 	//"github.com/joho/godotenv"
 	"github.com/nlopes/slack"
 )
@@ -52,57 +53,30 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
-	s, err := slack.SlashCommandParse(r)
+	fmt.Println("[INFO] Receiving /devops-on-duty request")
+	signingSecret := getEnv("SLACK_SIGNING_SECRET","")
+	verifier, err := slack.NewSecretsVerifier(r.Header, signingSecret)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
+	r.Body = ioutil.NopCloser(io.TeeReader(r.Body, &verifier))
+	s, err := slack.SlashCommandParse(r)
 	if err != nil {
 		fmt.Printf("[ERROR] on parsing: %v",err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	if !s.ValidateToken(os.Getenv("SLACK_VERIFICATION_TOKEN")) {
-		fmt.Printf("[ERROR] invalid token")
+	if err = verifier.Ensure(); err != nil {
+		fmt.Printf("[ERROR] invalid verfier")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	switch s.Command {
-	//case "/weather":
-		//params := &slack.Msg{Text: s.Text}
-		//zipCode := params.Text
-		//
-		//// Generates API request URL with zip code and API key
-		//url := fmt.Sprintf("https://api.openweathermap.org/data/2.5/weather?zip=%v&APPID=%v&units=imperial", zipCode, os.Getenv("API_KEY"))
-		//
-		//req, err := http.NewRequest("GET", url, nil)
-		//if err != nil {
-		//	log.Fatal(err)
-		//}
-		//
-		//client := &http.Client{}
-		//resp, err := client.Do(req)
-		//if err != nil {
-		//	log.Fatal(err)
-		//}
-		//
-		//defer resp.Body.Close()
-		//
-		//if resp.StatusCode == http.StatusOK {
-		//	apiResponse := &APIResponse{}
-		//
-		//	err = json.NewDecoder(resp.Body).Decode(&apiResponse)
-		//	if err != nil {
-		//		log.Fatal(err)
-		//	}
-		//
-		//	// Round temp to nearest integer
-		//	roundedTemp := math.Round(apiResponse.Weather.Temp)
-		//
-		//	response := fmt.Sprintf("The weather in %v is %v. The temperature is %v\u00B0 F.", apiResponse.Location, apiResponse.Summary[0].Description, roundedTemp)
-		//	w.Write([]byte(response))
-		//}
 	case "/devops-on-duty":
-		fmt.Println("[INFO] Receiving /devops-on-duty request")
 		err,onDuty := whoIsOnDutyNow()
 		var response string
 		if err != nil {
