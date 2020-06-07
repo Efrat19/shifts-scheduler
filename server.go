@@ -1,6 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"strconv"
+	"time"
+
 	//"encoding/json"
 	"fmt"
 	"io"
@@ -13,34 +17,10 @@ import (
 	"github.com/nlopes/slack"
 )
 
-// APIResponse maps to the JSON response from the Open Weather Map API
-type APIResponse struct {
-	Summary []struct {
-		ID          int    `json:"id"`
-		Main        string `json:"main"`
-		Description string `json:"description"`
-		Icon        string `json:"icon"`
-	} `json:"weather"`
-	Weather struct {
-		Temp     float64 `json:"temp"`
-		Humidity int     `json:"humidity"`
-		Pressure int     `json:"pressure"`
-		TempMin  float64 `json:"temp_min"`
-		TempMax  float64 `json:"temp_max"`
-	} `json:"main"`
-	Location string `json:"name"`
-}
-
 func main() {
-	// Load environment variables
-	//err := godotenv.Load("environment.env")
-	//if err != nil {
-	//	log.Fatal("Error loading .env file")
-	//}
 
 	http.HandleFunc("/devops-on-duty", slashCommandHandler)
 	http.HandleFunc("/healthz", healthzHandler)
-
 	fmt.Println("[INFO] Server listening")
 	http.ListenAndServe(":8080", nil)
 }
@@ -51,15 +31,34 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func logRequest(r *http.Request) {
+func logRequest(r *http.Request,devops string) {
+	webhook := getEnv("SLACK_WEBHOOK_URL","xxx")
 	fmt.Println("[INFO] Logging /devops-on-duty request")
 	fmt.Printf("%s just triggered a /devops-on-duty request",r.PostForm.Get("user_name"))
+	attachment := slack.Attachment{
+		Color:         "good",
+		Fallback:      "You successfully posted by Incoming Webhook URL!",
+		AuthorName:    "nlopes/slack",
+		AuthorSubname: "github.com",
+		AuthorLink:    "https://github.com/nlopes/slack",
+		AuthorIcon:    "https://avatars2.githubusercontent.com/u/652790",
+		Text:          fmt.Sprintf("Heads up for %s - %s just triggered a /devops-on-duty command",devops,r.PostForm.Get("user_name")),
+		Footer:        "slack api",
+		FooterIcon:    "https://platform.slack-edge.com/img/default_application_icon.png",
+		Ts:            json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
+	}
+	msg := slack.WebhookMessage{
+		Attachments: []slack.Attachment{attachment},
+	}
 
+	err := slack.PostWebhook(webhook, &msg)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("[INFO] Receiving /devops-on-duty request")
-	logRequest(r)
 	signingSecret := getEnv("SLACK_SIGNING_SECRET","")
 	verifier, err := slack.NewSecretsVerifier(r.Header, signingSecret)
 	if err != nil {
@@ -88,8 +87,10 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Printf("[ERROR] Error finding DevOps on duty today %v",err)
 			response = "Error finding DevOps on duty today"
+			logRequest(r,"error")
 		} else {
 			response = fmt.Sprintf("%s is on duty today",onDuty)
+			logRequest(r,onDuty)
 		}
 		w.Write([]byte(response))
 	default:
