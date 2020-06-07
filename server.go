@@ -31,10 +31,10 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func logRequest(r *http.Request,devops string) {
+func logRequest(user string ,devops string) {
 	webhook := getEnv("SLACK_WEBHOOK_URL","xxx")
 	fmt.Println("[INFO] Logging /devops-on-duty request")
-	fmt.Printf("%s just triggered a /devops-on-duty request",r.PostForm.Get("user_name"))
+	fmt.Printf("%s just triggered a /devops-on-duty request\n",user)
 	attachment := slack.Attachment{
 		Color:         "good",
 		Fallback:      "You successfully posted by Incoming Webhook URL!",
@@ -42,7 +42,7 @@ func logRequest(r *http.Request,devops string) {
 		AuthorSubname: "github.com",
 		AuthorLink:    "https://github.com/nlopes/slack",
 		AuthorIcon:    "https://avatars2.githubusercontent.com/u/652790",
-		Text:          fmt.Sprintf("Heads up for %s - %s just triggered a /devops-on-duty command",devops,r.PostForm.Get("user_name")),
+		Text:          fmt.Sprintf("Heads up for %s - %s just triggered a /devops-on-duty command",devops,user),
 		Footer:        "slack api",
 		FooterIcon:    "https://platform.slack-edge.com/img/default_application_icon.png",
 		Ts:            json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
@@ -87,10 +87,10 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Printf("[ERROR] Error finding DevOps on duty today %v",err)
 			response = "Error finding DevOps on duty today"
-			logRequest(r,"error")
+			logRequest(s.UserName,"error")
 		} else {
 			response = fmt.Sprintf("%s is on duty today",onDuty)
-			logRequest(r,onDuty)
+			logRequest(s.UserName,onDuty)
 		}
 		w.Write([]byte(response))
 	default:
