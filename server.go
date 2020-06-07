@@ -53,7 +53,7 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 
 func logRequest(r *http.Request) {
 	fmt.Println("[INFO] Logging /devops-on-duty request")
-	fmt.Printf("%v just triggered a /devops-on-duty request",r.Body)
+	fmt.Printf("%s just triggered a /devops-on-duty request",r.PostForm.Get("user_name"))
 
 }
 
