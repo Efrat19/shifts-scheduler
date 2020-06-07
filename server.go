@@ -37,7 +37,7 @@ func logRequest(user string ,userID string, devops string) {
 	fmt.Printf("%s (%s) just triggered a /devops-on-duty request\n",user,userID)
 	attachment := slack.Attachment{
 		Color:         "warning",
-		Fallback:      "You successfully posted by Incoming Webhook URL!",
+		Fallback:      fmt.Sprintf("Heads up for %s: %s (%s) just triggered a /devops-on-duty command",devops,user,userID),
 		//AuthorName:    "devops bot",
 		//AuthorSubname: "github.com",
 		//AuthorLink:    "https://github.com/nlopes/slack",
