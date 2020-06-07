@@ -75,6 +75,7 @@ func getConfigmapValue(key string) (error,string) {
 		fmt.Printf("Found configmap %s in namespace %s\n", configmap, namespace)
 		value := cm.Data[key]
 		if value != "" {
+			fmt.Printf("Found value %s for key %s\n", value, key)
 			return nil,value
 		}
 		return errors.New(fmt.Sprintf("requested key %s not found in configmap %s",key,configmap)),""
@@ -82,12 +83,16 @@ func getConfigmapValue(key string) (error,string) {
 }
 
 func checkForSpecialChange(date time.Time) (error,string) {
-	err,onDuty := getConfigmapValue(date.Format("02.01.2006"))
+	value := date.Format("02.01.2006")
+	fmt.Printf("checkForSpecialChange on %s\n", value)
+	err,onDuty := getConfigmapValue(value)
 	return err,onDuty
 }
 
 func checkDefaultSchedule(date time.Time) (error,string) {
-	err,onDuty := getConfigmapValue(date.Weekday().String())
+	value := date.Weekday().String()
+	fmt.Printf("checkDefaultSchedule on %s\n", value)
+	err,onDuty := getConfigmapValue(value)
 	return err,onDuty
 }
 
