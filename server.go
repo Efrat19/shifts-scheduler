@@ -83,10 +83,10 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 		err,onDuty := whoIsOnDutyNow()
 		var response string
 		if err != nil {
-			response = fmt.Sprintf("%s is on duty today",onDuty)
-		} else {
 			fmt.Printf("[ERROR] Error finding DevOps on duty today %v",err)
 			response = "Error finding DevOps on duty today"
+		} else {
+			response = fmt.Sprintf("%s is on duty today",onDuty)
 		}
 		w.Write([]byte(response))
 	default:
