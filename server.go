@@ -31,20 +31,20 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func logRequest(user string ,devops string) {
+func logRequest(user string ,userID string, devops string) {
 	webhook := getEnv("SLACK_WEBHOOK_URL","xxx")
 	fmt.Println("[INFO] Logging /devops-on-duty request")
-	fmt.Printf("%s just triggered a /devops-on-duty request\n",user)
+	fmt.Printf("%s (%s) just triggered a /devops-on-duty request\n",user,userID)
 	attachment := slack.Attachment{
-		Color:         "good",
+		Color:         "warning",
 		Fallback:      "You successfully posted by Incoming Webhook URL!",
-		AuthorName:    "nlopes/slack",
-		AuthorSubname: "github.com",
-		AuthorLink:    "https://github.com/nlopes/slack",
-		AuthorIcon:    "https://avatars2.githubusercontent.com/u/652790",
-		Text:          fmt.Sprintf("Heads up for %s - %s just triggered a /devops-on-duty command",devops,user),
-		Footer:        "slack api",
-		FooterIcon:    "https://platform.slack-edge.com/img/default_application_icon.png",
+		//AuthorName:    "devops bot",
+		//AuthorSubname: "github.com",
+		//AuthorLink:    "https://github.com/nlopes/slack",
+		//AuthorIcon:    "https://avatars2.githubusercontent.com/u/652790",
+		Text:          fmt.Sprintf("Heads up for %s: %s (%s) just triggered a /devops-on-duty command",devops,user,userID),
+		//Footer:        "slack api",
+		//FooterIcon:    "https://platform.slack-edge.com/img/default_application_icon.png",
 		Ts:            json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
 	}
 	msg := slack.WebhookMessage{
@@ -87,10 +87,10 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Printf("[ERROR] Error finding DevOps on duty today %v",err)
 			response = "Error finding DevOps on duty today"
-			logRequest(s.UserName,"error")
+			logRequest(s.UserName,s.UserID,"error")
 		} else {
 			response = fmt.Sprintf("%s is on duty today",onDuty)
-			logRequest(s.UserName,onDuty)
+			logRequest(s.UserName,s.UserID,onDuty)
 		}
 		w.Write([]byte(response))
 	default:
