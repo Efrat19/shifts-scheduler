@@ -78,13 +78,13 @@ func getConfigmapValue(key string) (error,string) {
 			fmt.Printf("Found value %s for key %s\n", value, key)
 			return nil,value
 		}
-		fmt.Printf("requested key %s not found in configmap %s",key,configmap)
+		fmt.Printf("requested key %s not found in configmap %s\n",key,configmap)
 		return errors.New(fmt.Sprintf("requested key %s not found in configmap %s",key,configmap)),""
 	}
 }
 
 func checkForSpecialChange(date time.Time) (error,string) {
-	value := date.Format("02.01.2006")
+	value := date.Format("02-01-2006")
 	fmt.Printf("checkForSpecialChange on %s\n", value)
 	return getConfigmapValue(value)
 }
