@@ -45,6 +45,7 @@ func main() {
 }
 
 func healthzHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("[INFO] Receiving /healthz request")
 	w.WriteHeader(http.StatusOK)
 	return
 }
@@ -54,11 +55,13 @@ func slashCommandHandler(w http.ResponseWriter, r *http.Request) {
 	s, err := slack.SlashCommandParse(r)
 
 	if err != nil {
+		fmt.Printf("[ERROR] on parsing: %v",err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if !s.ValidateToken(os.Getenv("SLACK_VERIFICATION_TOKEN")) {
+		fmt.Printf("[ERROR] invalid token")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
