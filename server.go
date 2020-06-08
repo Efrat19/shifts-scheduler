@@ -42,7 +42,7 @@ func logRequest(user string ,userID string, devops string) {
 		//AuthorSubname: "github.com",
 		//AuthorLink:    "https://github.com/nlopes/slack",
 		//AuthorIcon:    "https://avatars2.githubusercontent.com/u/652790",
-		Text:          fmt.Sprintf("Heads up for %s: %s (%s) just triggered a /devops-on-duty command",devops,user,userID),
+		Text:          fmt.Sprintf("Heads up for %s: %s just triggered a /devops-on-duty command",devops,user),
 		//Footer:        "slack api",
 		//FooterIcon:    "https://platform.slack-edge.com/img/default_application_icon.png",
 		Ts:            json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
