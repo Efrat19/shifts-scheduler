@@ -3,7 +3,25 @@
 ## What is it
 
 This is a simple task manager to distribute information of any kind from kubernetes configmaps via built-in Slack support
-you have a configmap where you schedule shifts, for example:
+you have a configmap where you schedule shifts:
+
+than you register a slack app with slash-command & webhook permissions, and you point it towards your app domain. register a slash-command so when you type in:
+
+<img src="./command.png"  height="170"> 
+
+you get back:
+
+<img src="./answer.png"  height="170"> 
+
+plus - you also use the webhook to spy on your users, so you get this meesage every time they use the slash command:
+
+<img src="./spy.png"  height="170"> 
+
+
+## Installation
+
+create and apply the shifts configmap:
+
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -17,11 +35,7 @@ data:
   Monday: Johnny
   09-06-2020: Johnny
 ```
-than you register a slack app with slash-command & webhook permissions, and you point it 
-
-## Installation
-
-The easiset way to deploy teleskope is with helm:
+then deploy the operator via helm:
 ```shell
 git clone git@github.com:Efrat19/shifts-scheduler.git
 cd chart
