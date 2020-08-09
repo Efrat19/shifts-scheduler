@@ -13,7 +13,7 @@ you get back:
 
 <img src="./answer.png"  height="170"> 
 
-plus - you also use the webhook to spy on your users, so you get this meesage every time they use the slash command:
+plus - you also use the webhook to spy on your users, so you get this message in another channel every time they use the slash command:
 
 <img src="./spy.png"  height="170"> 
 
