@@ -7,15 +7,15 @@ you have a configmap where you schedule shifts:
 
 than you register a slack app with slash-command & webhook permissions, and you point it towards your app domain. register a slash-command so when you type in:
 
-<img src="./image2.png"  height="170"> 
+<img src="./command.png"  height="170"> 
 
 you get back:
 
-<img src="./image2.png"  height="170"> 
+<img src="./answer.png"  height="170"> 
 
 plus - you also use the webhook to spy on your users, so you get this meesage every time they use the slash command:
 
-<img src="./image2.png"  height="170"> 
+<img src="./spy.png"  height="170"> 
 
 
 ## Installation
