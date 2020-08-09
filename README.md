@@ -7,15 +7,15 @@ you have a configmap where you schedule shifts:
 
 than you register a slack app with slash-command & webhook permissions, and you point it towards your app domain. register a slash-command so when you type in:
 
-<img src="./command.png"  height="170"> 
+<img src="./command.png"  height="100"> 
 
 you get back:
 
-<img src="./answer.png"  height="170"> 
+<img src="./answer.png"  height="100"> 
 
 plus - you also use the webhook to spy on your users, so you get this message in another channel every time they use the slash command:
 
-<img src="./spy.png"  height="170"> 
+<img src="./spy.png"  height="100"> 
 
 
 ## Installation
@@ -42,8 +42,6 @@ cd chart
 kubectl create ns shifts-scheduler
 helm install --name shifts-scheduler -f example.yaml
 ```
-
-## How 
 
 ## Built With
 
