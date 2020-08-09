@@ -5,7 +5,17 @@
 This is a simple task manager to distribute information of any kind from kubernetes configmaps via built-in Slack support
 you have a configmap where you schedule shifts, for example:
 ```yaml
-
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: devops-shifts-board
+  name: devops-shifts-board
+  namespace: default
+data:
+  Sunday: Efrat
+  Monday: Johnny
+  09-06-2020: Johnny
 ```
 than you register a slack app with slash-command & webhook permissions, and you point it 
 
