@@ -3,9 +3,7 @@
 ## What is it
 
 This is a simple task manager to distribute information of any kind from kubernetes configmaps via built-in Slack support
-you have a configmap where you schedule shifts:
-
-than you register a slack app with slash-command & webhook permissions, and you point it towards your app domain. register a slash-command so when you type in:
+you have a configmap where you schedule shifts, then you register a slack app with slash-command & webhook permissions, and you point it towards your app domain. register a slash-command so when you type in:
 
 <img src="./command.png"  height="100"> 
 
