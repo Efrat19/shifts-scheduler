@@ -1,6 +1,7 @@
 FROM golang:1.14-alpine
 
-RUN apk add git
+ENV TZ=Asia/Jerusalem
+RUN apk add git tzdata
 
 WORKDIR /go/src/app
 COPY . .

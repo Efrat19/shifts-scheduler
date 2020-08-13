@@ -34,15 +34,15 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 func logRequest(user string ,userID string, devops string) {
 	webhook := getEnv("SLACK_WEBHOOK_URL","xxx")
 	fmt.Println("[INFO] Logging /devops-on-duty request")
-	fmt.Printf("%s (%s) just triggered a /devops-on-duty request\n",user,userID)
+	fmt.Printf("%s (%s) just issued the /devops-on-duty command\n",user,userID)
 	attachment := slack.Attachment{
 		Color:         "warning",
-		Fallback:      fmt.Sprintf("Heads up for %s: %s (%s) just triggered a /devops-on-duty command",devops,user,userID),
+		Fallback:      fmt.Sprintf("Heads up for %s: %s (%s) just issued the /devops-on-duty command",devops,user,userID),
 		//AuthorName:    "devops bot",
 		//AuthorSubname: "github.com",
 		//AuthorLink:    "https://github.com/nlopes/slack",
 		//AuthorIcon:    "https://avatars2.githubusercontent.com/u/652790",
-		Text:          fmt.Sprintf("Heads up for %s: %s (%s) just triggered a /devops-on-duty command",devops,user,userID),
+		Text:          fmt.Sprintf("Heads up for %s: %s just issued the /devops-on-duty command",devops,user),
 		//Footer:        "slack api",
 		//FooterIcon:    "https://platform.slack-edge.com/img/default_application_icon.png",
 		Ts:            json.Number(strconv.FormatInt(time.Now().Unix(), 10)),
